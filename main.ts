@@ -8,15 +8,12 @@ import { PerishableProduct } from "./Product/PerishableProduct";
 
 // Global Variables
 var products: Product[] = []; 
+const BACK_OPTION = 0;
+
 
 // ============== MAIN =================
 function main(): void {
   //variables declarations
-  let userOption: number = 0;
-
-  const END_OPTION = -1;
-  const BACK_OPTION = 0;
-
   let name: string, shopName: string;
 
   // Start the program
@@ -24,15 +21,11 @@ function main(): void {
 
   name = getInput("Type your name: ", "string");
   console.log(`Welcome , Sr. ${name}. Let's continue`);
-  shopName = getInput("Type the name of your shop: ", "string");
 
   do{
-    showMainMenu(shopName);
-    userOption = getInput("Type your option: ", "number");
-
-    manageMainChoice(userOption);
-    userOption = getInput("Type your option: ", "number");
-  }while(userOption != END_OPTION);
+    showMainMenu();
+    manageMainChoice();
+  }while(true);
 
 }
 
@@ -60,10 +53,10 @@ function getInput(message: string, type: string): any{
 }
 
 // Menus
-function showMainMenu(shopName: string): void{
+function showMainMenu(): void{
   console.log(`
 Which service do you want to access?
-------------- ${shopName} - Fox Shop System --------------
+--------------------- Fox Shop System --------------------
   1 - Products
   2 - Clients
   3 - Sales
@@ -74,7 +67,7 @@ Which service do you want to access?
 
 function showProductMenu(): void {
   console.log(`
-    -------------------- Fox Shop System ---------------------
+    -------------------- PRODUCTS ---------------------
       1 - Show all products
       2 - Show products in stock
       3 - Show product out of stock
@@ -88,7 +81,7 @@ function showProductMenu(): void {
 
 function showClientMenu(): void {
   console.log(`
-    -------------------- Fox Shop System ---------------------
+    -------------------- CLIENTS ---------------------
       1 - Show all clients
       2 - Register new client
       0 - BACK
@@ -99,7 +92,7 @@ function showClientMenu(): void {
 
 function showSaleMenu(): void {
   console.log(`
-    -------------------- Fox Shop System ---------------------
+    -------------------- SALES ---------------------
       1 - Show all sales
       2 - Show sale by client name
       3 - Register new sale
@@ -110,10 +103,12 @@ function showSaleMenu(): void {
 }
 
 // Management choice 
-function manageMainChoice(userChoice: number): void{
-  switch (userChoice) {
+function manageMainChoice(): void{
+  let userOption = getInput("Type your option: ", "number");
+  switch (userOption) {
     case 1:
       showProductMenu();
+      manageProductChoice();
       break;
     
     case 2: showClientMenu();
@@ -123,11 +118,39 @@ function manageMainChoice(userChoice: number): void{
       break;
 
     case 4: 
-      console.log("See you soon!")
+      console.log("See you soon!");
       process.exit(0);
 
     default:
       console.log("Invalid option\n");
+      break;
+  }
+}
+
+function manageProductChoice(): void{
+  let userOption = getInput("Type your option: ", "number");
+  switch (userOption) {
+    case 1:
+      listAllProducts();
+      break;
+  
+    case 2:
+      listProductsInStock();
+      break;
+    
+    case 3:
+    case 4:
+    case 5:
+    case 6:
+      console.log("In development");
+      break;
+
+    case BACK_OPTION:
+      console.log("Back to MAIN");
+      break;
+
+    default:
+      console.log("Invalid option\n")
       break;
   }
 }
