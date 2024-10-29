@@ -14,7 +14,9 @@ const BACK_OPTION = 0;
 // ============== MAIN =================
 function main(): void {
   //variables declarations
-  let name: string, shopName: string;
+  let name: string;
+
+  let userOption: number;
 
   // Start the program
   console.log("Welcome to Fox Shop System");
@@ -22,11 +24,7 @@ function main(): void {
   name = getInput("Type your name: ", "string");
   console.log(`Welcome , Sr. ${name}. Let's continue`);
 
-  do{
-    showMainMenu();
-    manageMainChoice();
-  }while(true);
-
+  while(manageMainChoice() != BACK_OPTION);
 }
 
 main()
@@ -103,56 +101,94 @@ function showSaleMenu(): void {
 }
 
 // Management choice 
-function manageMainChoice(): void{
-  let userOption = getInput("Type your option: ", "number");
-  switch (userOption) {
-    case 1:
-      showProductMenu();
-      manageProductChoice();
-      break;
-    
-    case 2: showClientMenu();
-      break;
+function manageMainChoice(): number{
+  let userOption: number;
+  do{
+    console.log(`
+Which service do you want to access?
+--------------------- Fox Shop System --------------------
+  1 - Products
+  2 - Clients
+  3 - Sales
+  0 - End Program
+----------------------------------------------------------
+    `);
 
-    case 3: showSaleMenu();
-      break;
+    userOption = getInput("Type your option: ", "number");
+    switch (userOption) {
+      case 1:
+        manageProductChoice();
+        break;
+      
+      case 2: showClientMenu();
+        break;
 
-    case 4: 
-      console.log("See you soon!");
-      process.exit(0);
+      case 3: showSaleMenu();
+        break;
 
-    default:
-      console.log("Invalid option\n");
-      break;
-  }
+      case 0: 
+        console.log("See you soon!");
+        break;
+
+      default:
+        console.log("Invalid option\n");
+        break;
+    }
+  }while(userOption != BACK_OPTION);
+
+  return userOption;
 }
 
 function manageProductChoice(): void{
-  let userOption = getInput("Type your option: ", "number");
-  switch (userOption) {
-    case 1:
-      listAllProducts();
-      break;
-  
-    case 2:
-      listProductsInStock();
-      break;
+  let userOption: number;
+  do {
+    console.log(`
+-------------------- PRODUCTS ---------------------
+  1 - Show all products
+  2 - Show products in stock
+  3 - Show product out of stock
+  4 - Register new product
+  5 - Increment product
+  6 - Delete product
+  0 - BACK
+----------------------------------------------------------
+    `);
+
+    userOption = getInput("Type your option: ", "number");
+    switch (userOption) {
+      case 1:
+        listAllProducts();
+        break;
     
-    case 3:
-    case 4:
-    case 5:
-    case 6:
-      console.log("In development");
-      break;
+      case 2:
+        listProductsInStock();
+        break;
+      
+      case 3:
+        listProductsOutOfStock();
+        break;
 
-    case BACK_OPTION:
-      console.log("Back to MAIN");
-      break;
+      case 4:
+        registerProduct();
+        break;
 
-    default:
-      console.log("Invalid option\n")
-      break;
-  }
+      case 5:
+        incrementProduct();
+        break;
+
+      case 6:
+        deleteProduct();
+        break;
+  
+      case BACK_OPTION:
+        console.log("Back to MAIN");
+        break;
+  
+      default:
+        console.log("Invalid option\n")
+        break;
+    }
+  }while(userOption != BACK_OPTION);
 }
 
 // PRODUCTS
@@ -169,4 +205,37 @@ function listProductsInStock(): void {
   productsInStock.map((product, index) => {
     console.log(`ID: ${index+1} | Product Name: ${product.name}`);
   })
+}
+
+function listProductsOutOfStock(): void {
+  let productsInStock = products.filter((product) => product.stock == 0); 
+  console.log("----------- Out of Stock --------------");
+  productsInStock.map((product, index) => {
+    console.log(`ID: ${index+1} | Product Name: ${product.name}`);
+  })
+}
+
+function registerProduct(): void {
+  const name = getInput("Type the name of the product: ", "string");
+  const purchasePrice = getInput("Type the purchase price of the product: ", "number");
+  const salePrice = getInput("Type the sale price of the product: ", "number");
+  const stock = getInput("Type the number of this product in stock: ", "number");
+  const isPerishable = (getInput("Is perishable (Y to YES and any other key to NO)? ", "string").toUpperCase == "Y");
+  console.log(isPerishable);
+  if(isPerishable){
+    const validateDate = getInput("Type the validateDate: ", "string");
+    products.push(new PerishableProduct(name, purchasePrice, salePrice, stock, validateDate));
+  }
+  else products.push(new NoPerishableProduct(name, purchasePrice, salePrice, stock));
+}
+
+function incrementProduct(): void{
+  const id = getInput("Type the ID of the product: ", "number");
+  const quantity = getInput("Type the new quantity to increment: ", "number");
+  products[id].stock+=quantity;
+}
+
+function deleteProduct(): void{
+  const id = getInput("Type the ID of the product: ", "number");
+  products.splice(id+1, 1);
 }
