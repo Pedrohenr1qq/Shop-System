@@ -6,8 +6,12 @@ import { Product } from "./Product/Product";
 import { NoPerishableProduct } from "./Product/NoPerishableProduct";
 import { PerishableProduct } from "./Product/PerishableProduct";
 
+import { Client } from "./Client";
+
 // Global Variables
-var products: Product[] = []; 
+var products: Product[] = [];
+var clients: Client[] = [];
+
 const BACK_OPTION = 0;
 
 
@@ -50,42 +54,6 @@ function getInput(message: string, type: string): any{
   return input;
 }
 
-// Menus
-function showMainMenu(): void{
-  console.log(`
-Which service do you want to access?
---------------------- Fox Shop System --------------------
-  1 - Products
-  2 - Clients
-  3 - Sales
-  4 - End Program
-----------------------------------------------------------
-  `);
-}
-
-function showProductMenu(): void {
-  console.log(`
-    -------------------- PRODUCTS ---------------------
-      1 - Show all products
-      2 - Show products in stock
-      3 - Show product out of stock
-      4 - Register new product
-      5 - Increment product
-      6 - Delete product
-      0 - BACK
-    ----------------------------------------------------------
-  `);
-}
-
-function showClientMenu(): void {
-  console.log(`
-    -------------------- CLIENTS ---------------------
-      1 - Show all clients
-      2 - Register new client
-      0 - BACK
-    ----------------------------------------------------------
-  `);
-}
 
 
 function showSaleMenu(): void {
@@ -120,7 +88,8 @@ Which service do you want to access?
         manageProductChoice();
         break;
       
-      case 2: showClientMenu();
+      case 2: 
+        manageClientChoice();
         break;
 
       case 3: showSaleMenu();
@@ -191,6 +160,39 @@ function manageProductChoice(): void{
   }while(userOption != BACK_OPTION);
 }
 
+function manageClientChoice(): void{
+  let userOption: number;
+  do {
+    console.log(`
+-------------------- CLIENTS ---------------------
+  1 - Show all clients
+  2 - Register new client
+  0 - BACK
+--------------------------------------------------
+    `);
+    userOption = getInput("Type your option: ", "number");
+
+    switch (userOption) {
+      case 1:
+        listAllClients();
+        break;
+      
+      case 2:
+        registerClient();
+        break;
+    
+      case BACK_OPTION:
+        console.log("Back to main");
+        break;
+
+      default:
+        console.log("Invalid option");
+        break;
+    }
+
+  } while (userOption != BACK_OPTION);
+}
+
 // PRODUCTS
 function listAllProducts(): void {
   console.log("----------- All Products --------------");
@@ -250,4 +252,23 @@ function deleteProduct(): void{
   }
   products.splice(id-1, 1);
   console.log("\nProduct deleted");
+}
+
+// CLIENTS
+function listAllClients(): void{
+  console.log("----------- All Clients --------------");
+  clients.map((client, index) => {
+    console.log(`ID: ${index+1} | Product Name: ${client.name}`);
+  });
+  console.log();
+}
+
+function registerClient(): void{
+  const name = getInput("Type the name of the client: ", "string");
+  if(name.trim() == ""){
+    console.log("The name field couldn't be empty");
+    return;
+  }
+  clients.push(new Client(name));
+  console.log("\nClient registered");
 }
