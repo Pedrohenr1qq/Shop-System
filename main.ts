@@ -195,15 +195,15 @@ function manageProductChoice(): void{
 function listAllProducts(): void {
   console.log("----------- All Products --------------");
   products.map((product, index) => {
-    console.log(`ID: ${index+1} | Product Name: ${product.name}`);
-  })
+    console.log(`ID: ${index+1} | Product Name: ${product.name} | Type: ${product.type}`);
+  });
 }
 
 function listProductsInStock(): void {
   let productsInStock = products.filter((product) => product.stock > 0); 
   console.log("----------- In Stock --------------");
   productsInStock.map((product, index) => {
-    console.log(`ID: ${index+1} | Product Name: ${product.name}`);
+    console.log(`ID: ${index+1} | Product Name: ${product.name} | Type: ${product.type}`);
   })
 }
 
@@ -211,7 +211,7 @@ function listProductsOutOfStock(): void {
   let productsInStock = products.filter((product) => product.stock == 0); 
   console.log("----------- Out of Stock --------------");
   productsInStock.map((product, index) => {
-    console.log(`ID: ${index+1} | Product Name: ${product.name}`);
+    console.log(`ID: ${index+1} | Product Name: ${product.name} | Type: ${product.type}`);
   })
 }
 
@@ -220,22 +220,34 @@ function registerProduct(): void {
   const purchasePrice = getInput("Type the purchase price of the product: ", "number");
   const salePrice = getInput("Type the sale price of the product: ", "number");
   const stock = getInput("Type the number of this product in stock: ", "number");
-  const isPerishable = (getInput("Is perishable (Y to YES and any other key to NO)? ", "string").toUpperCase == "Y");
-  console.log(isPerishable);
+  const isPerishable = (getInput("Is perishable (Y to YES and any other key to NO)? ", "string")) == "Y";
   if(isPerishable){
     const validateDate = getInput("Type the validateDate: ", "string");
     products.push(new PerishableProduct(name, purchasePrice, salePrice, stock, validateDate));
   }
   else products.push(new NoPerishableProduct(name, purchasePrice, salePrice, stock));
+
+  console.log("\nProduct registered");
 }
 
 function incrementProduct(): void{
   const id = getInput("Type the ID of the product: ", "number");
-  const quantity = getInput("Type the new quantity to increment: ", "number");
+  let quantity = getInput("Type the new quantity to increment: ", "number");
+  if(quantity < 0) quantity = 0;
+  if(!products[id]){
+    console.log("\nProduct not found");
+    return;
+  }
   products[id].stock+=quantity;
+  console.log(`New stock of ${products[id].name}: ${products[id].stock}`);
 }
 
 function deleteProduct(): void{
   const id = getInput("Type the ID of the product: ", "number");
-  products.splice(id+1, 1);
+  if(!products[id]){
+    console.log("\nProduct not found");
+    return;
+  }
+  products.splice(id-1, 1);
+  console.log("\nProduct deleted");
 }

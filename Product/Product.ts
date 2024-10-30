@@ -6,10 +6,10 @@ export abstract class Product {
   protected abstract _type: string;
   
   constructor(name: string, purchasePrice: number, salePrice: number, stock: number){
-    this._name = name;
-    this._purchasePrice = purchasePrice;
-    this._salePrice = salePrice;
-    this._stock = stock;
+    this._name = (name != "") ? name : "undefined";
+    this._purchasePrice = (purchasePrice >= 0) ? purchasePrice : 0;
+    this._salePrice = (salePrice >= 0) ? salePrice : 0;
+    this._stock = (stock >= 0) ? stock : 0;
   }
 
   
@@ -18,7 +18,7 @@ export abstract class Product {
   }
 
   public set name(newName : string) {
-    this._name = newName;
+    this._name = (newName != "") ? newName : "undefined";
   }
 
   public get purchasePrice() : number {
