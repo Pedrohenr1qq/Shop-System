@@ -20,7 +20,7 @@ export class PerishableProduct extends Product{
     return `
     -------------- PRODUCT -----------------
       Name: ${this.name}
-      Purchase price: ${this.puchasePrice}
+      Purchase price: ${this.purchasePrice}
       Sale price: ${this.salePrice}
       In stock: ${this.stock}
       Validate data: ${this.validateDate}

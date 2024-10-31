@@ -25,7 +25,7 @@ export abstract class Product {
     return this._purchasePrice;
   }
 
-  public set puchasePrice(newPurchasePrice : number) {
+  public set purchasePrice(newPurchasePrice : number) {
     (newPurchasePrice < 0) ? 0 : null; 
     this._purchasePrice = newPurchasePrice;
   }

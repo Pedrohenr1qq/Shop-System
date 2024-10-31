@@ -2,15 +2,16 @@
 const prompt= require('prompt-sync')();
 
 // Internal Requires
-import { Product } from "./Product/Product";
-import { NoPerishableProduct } from "./Product/NoPerishableProduct";
-import { PerishableProduct } from "./Product/PerishableProduct";
+import { Product } from "./model/Product/Product";
+import { NoPerishableProduct } from "./model/Product/NoPerishableProduct";
+import { PerishableProduct } from "./model/Product/PerishableProduct";
 
-import { Client } from "./Client";
+import { createClientController, deleteClientController, findAllClientsController, findClientByIdController } from "./controller/client.controller";
+import { findAllSalesController } from "./controller/sale.controller";
+import {createNoPerishableProductController, createPerishableProductController, deleteProductController, findAllProductsController, findProductsInStock, findProductsOutOfStock } from "./controller/product.controller";
 
 // Global Variables
 var products: Product[] = [];
-var clients: Client[] = [];
 
 const BACK_OPTION = 0;
 
@@ -92,7 +93,8 @@ Which service do you want to access?
         manageClientChoice();
         break;
 
-      case 3: showSaleMenu();
+      case 3: 
+        manageSaleChoice();
         break;
 
       case 0: 
@@ -110,6 +112,7 @@ Which service do you want to access?
 
 function manageProductChoice(): void{
   let userOption: number;
+  let id: number;
   do {
     console.log(`
 -------------------- PRODUCTS ---------------------
@@ -126,27 +129,37 @@ function manageProductChoice(): void{
     userOption = getInput("Type your option: ", "number");
     switch (userOption) {
       case 1:
-        listAllProducts();
+        findAllProductsController();
         break;
     
       case 2:
-        listProductsInStock();
+        findProductsInStock();
         break;
       
       case 3:
-        listProductsOutOfStock();
+        findProductsOutOfStock();
         break;
 
       case 4:
-        registerProduct();
+        const name = getInput("Type the name of the product: ", "string");
+        const purchasePrice = getInput("Type the purchase price of the product: ", "number");
+        const salePrice = getInput("Type the sale price of the product: ", "number");
+        const stock = getInput("Type the number of this product in stock: ", "number");
+        const isPerishable = (getInput("Is perishable (Y to YES and any other key to NO)? ", "string")) == "Y";
+        if(isPerishable){
+          const validateDate = getInput("Type the validateDate: ", "string");
+          createPerishableProductController(name, purchasePrice, salePrice, stock, validateDate);
+        }
+        else createNoPerishableProductController(name, purchasePrice, salePrice, stock);
         break;
 
       case 5:
-        incrementProduct();
+        console.log("In develepment");
         break;
 
       case 6:
-        deleteProduct();
+        id = getInput("Type the id of the product: ", "number");
+        deleteProductController(id);
         break;
   
       case BACK_OPTION:
@@ -162,11 +175,16 @@ function manageProductChoice(): void{
 
 function manageClientChoice(): void{
   let userOption: number;
+  let id: number;
+  let name: string;
+
   do {
     console.log(`
 -------------------- CLIENTS ---------------------
   1 - Show all clients
-  2 - Register new client
+  2 - Find client by ID
+  3 - Register new client
+  4 - Delete client
   0 - BACK
 --------------------------------------------------
     `);
@@ -174,13 +192,24 @@ function manageClientChoice(): void{
 
     switch (userOption) {
       case 1:
-        listAllClients();
+        findAllClientsController();
         break;
       
       case 2:
-        registerClient();
+        id = getInput("Type the id of the client: ", "number");
+        findClientByIdController(id);
         break;
     
+      case 3:
+        name = getInput("Type the name of the client: ", "string");
+        createClientController(name);
+        break;
+
+      case 4:
+        id = getInput("Type the id of the client: ", "number");
+        deleteClientController(id);
+        break;
+        
       case BACK_OPTION:
         console.log("Back to main");
         break;
@@ -193,82 +222,37 @@ function manageClientChoice(): void{
   } while (userOption != BACK_OPTION);
 }
 
-// PRODUCTS
-function listAllProducts(): void {
-  console.log("----------- All Products --------------");
-  products.map((product, index) => {
-    console.log(`ID: ${index+1} | Product Name: ${product.name} | Type: ${product.type}`);
-  });
-}
+function manageSaleChoice() {
+  let userOption: number;
+  do {
+    console.log(`
+-------------------- SALES ---------------------
+  1 - Show all sales
+  2 - Show sale by client name
+  3 - Register new sale
+  4 - Detail sale
+  0 - BACK
+------------------------------------------------
+  `);
+    userOption = getInput("Type your option: ", "number");
 
-function listProductsInStock(): void {
-  let productsInStock = products.filter((product) => product.stock > 0); 
-  console.log("----------- In Stock --------------");
-  productsInStock.map((product, index) => {
-    console.log(`ID: ${index+1} | Product Name: ${product.name} | Type: ${product.type}`);
-  })
-}
+    switch (userOption) {
+      case 1:
+        findAllSalesController();
+        break;
+      
+      case 2:
+        break;
 
-function listProductsOutOfStock(): void {
-  let productsInStock = products.filter((product) => product.stock == 0); 
-  console.log("----------- Out of Stock --------------");
-  productsInStock.map((product, index) => {
-    console.log(`ID: ${index+1} | Product Name: ${product.name} | Type: ${product.type}`);
-  })
-}
+      case BACK_OPTION:
+        console.log("Back to main");
+        break;
 
-function registerProduct(): void {
-  const name = getInput("Type the name of the product: ", "string");
-  const purchasePrice = getInput("Type the purchase price of the product: ", "number");
-  const salePrice = getInput("Type the sale price of the product: ", "number");
-  const stock = getInput("Type the number of this product in stock: ", "number");
-  const isPerishable = (getInput("Is perishable (Y to YES and any other key to NO)? ", "string")) == "Y";
-  if(isPerishable){
-    const validateDate = getInput("Type the validateDate: ", "string");
-    products.push(new PerishableProduct(name, purchasePrice, salePrice, stock, validateDate));
-  }
-  else products.push(new NoPerishableProduct(name, purchasePrice, salePrice, stock));
+      default:
+        console.log("Invalid option");
+        break;
+    }
+  } while (userOption != BACK_OPTION);
 
-  console.log("\nProduct registered");
-}
-
-function incrementProduct(): void{
-  const id = getInput("Type the ID of the product: ", "number");
-  let quantity = getInput("Type the new quantity to increment: ", "number");
-  if(quantity < 0) quantity = 0;
-  if(!products[id]){
-    console.log("\nProduct not found");
-    return;
-  }
-  products[id].stock+=quantity;
-  console.log(`New stock of ${products[id].name}: ${products[id].stock}`);
-}
-
-function deleteProduct(): void{
-  const id = getInput("Type the ID of the product: ", "number");
-  if(!products[id]){
-    console.log("\nProduct not found");
-    return;
-  }
-  products.splice(id-1, 1);
-  console.log("\nProduct deleted");
-}
-
-// CLIENTS
-function listAllClients(): void{
-  console.log("----------- All Clients --------------");
-  clients.map((client, index) => {
-    console.log(`ID: ${index+1} | Product Name: ${client.name}`);
-  });
-  console.log();
-}
-
-function registerClient(): void{
-  const name = getInput("Type the name of the client: ", "string");
-  if(name.trim() == ""){
-    console.log("The name field couldn't be empty");
-    return;
-  }
-  clients.push(new Client(name));
-  console.log("\nClient registered");
+  
 }

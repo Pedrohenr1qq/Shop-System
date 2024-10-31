@@ -10,7 +10,7 @@ export class NoPerishableProduct extends Product{
     return `
     -------------- PRODUCT -----------------
       Name: ${this.name}
-      Purchase price: ${this.puchasePrice}
+      Purchase price: ${this.purchasePrice}
       Sale price: ${this.salePrice}
       In stock: ${this.stock}
     ----------------------------------------
